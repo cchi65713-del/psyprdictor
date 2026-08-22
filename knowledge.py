@@ -161,7 +161,7 @@ STATE_OF_MIND = [
     "Accepting",
     "Avoidant",
     "Observant",
-    "Determined"
+    "Patient"
 ]
 
 
