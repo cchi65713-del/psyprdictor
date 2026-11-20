@@ -2,6 +2,13 @@ from registry import Registry
 from activation import ActivationEngine
 from box import Box
 from knowledge import *
+from efmsomb_taxonomy import (
+    BehaviorSignature,
+    EmotionState,
+    FeelingState,
+    MoodState,
+    StateOfMindState,
+)
 from memory import Memory
 from experience import Experience
 from pattern import PatternRecognizer
@@ -51,11 +58,36 @@ person_state.update_context(
     context="Someone insulted the person"
 )
 
-person_state.update_efmsomb(
-    emotion="E4",
-    feeling="F3",
-    mood="M2",
-    state_of_mind="S5"
+person_state.apply_efmsomb_taxonomy(
+    emotion_state=EmotionState(
+        label="E4",
+        intensity=0.88,
+        valence="negative",
+        confidence=0.82,
+    ),
+    feeling_state=FeelingState(
+        quality="F3",
+        texture="sharp",
+        intensity=0.78,
+        salience=0.9,
+    ),
+    mood_state=MoodState(
+        tone="M2",
+        intensity=0.66,
+        drift=0.2,
+        decay=0.1,
+    ),
+    state_of_mind_state=StateOfMindState(
+        frame="S5",
+        regulation_mode="defensive",
+        control_level=0.42,
+        flexibility=0.55,
+        cognitive_bias="hostile",
+    ),
+    behavior_state=BehaviorSignature(
+        signature="B1",
+        mode="protective",
+    ),
 )
 
 
@@ -912,13 +944,36 @@ person.update_context(
     trigger="Insult"
 )
 
-person.update_efmsomb(
-    emotion="Anger",
-    feeling="Disrespected",
-    mood="Irritated",
-    state_of_mind={
-        "defensive": True
-    }
+person.apply_efmsomb_taxonomy(
+    emotion_state=EmotionState(
+        label="Anger",
+        intensity=0.82,
+        valence="negative",
+        confidence=0.78,
+    ),
+    feeling_state=FeelingState(
+        quality="Disrespected",
+        texture="sharp",
+        intensity=0.75,
+        salience=0.8,
+    ),
+    mood_state=MoodState(
+        tone="Irritated",
+        intensity=0.64,
+        drift=0.25,
+        decay=0.12,
+    ),
+    state_of_mind_state=StateOfMindState(
+        frame="Defensive",
+        regulation_mode="redirect",
+        control_level=0.46,
+        flexibility=0.58,
+        cognitive_bias="self_protective",
+    ),
+    behavior_state=BehaviorSignature(
+        signature="B1",
+        mode="protective",
+    ),
 )
 
 person.add_active_pattern("E4.F3.M2")

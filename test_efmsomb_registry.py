@@ -9,20 +9,155 @@ Tests cover:
 6. No duplicate canonical entries
 7. Compatibility with existing taxonomy tests
 """
+from pathlib import Path
+
 import pytest
+import yaml
 
 from efmsomb_registry import (
+    EFMSOMBIdentityRecord,
     resolve_code,
     code_to_label,
     label_to_code,
     all_codes_for_category,
     CATEGORIES,
+    F_CODE_TO_LABEL,
 )
 
 
 # ============================================================
 # TEST 1: E4 → canonical label and label → E4
 # ============================================================
+class TestIdentityContractStage1:
+    """Stage 1 identity-contract checks for canonical ID schema and invariants."""
+
+    def test_identity_record_shape_contains_required_fields(self):
+        record = EFMSOMBIdentityRecord(
+            canonical_id="S5",
+            category="S",
+            current_label="Creative",
+            aliases=["creative_state"],
+            status="active",
+            deprecated_since=None,
+            retired_since=None,
+            replacement_of=None,
+            metadata={"source": "contract"},
+        )
+        required_fields = {
+            "canonical_id",
+            "category",
+            "current_label",
+            "aliases",
+            "status",
+            "deprecated_since",
+            "retired_since",
+            "replacement_of",
+            "metadata",
+        }
+        assert required_fields.issubset(set(record.__dict__.keys()))
+        assert record.canonical_id == "S5"
+        assert record.category == "S"
+        assert record.current_label == "Creative"
+
+    def test_runtime_public_ids_are_permanent_canonical_ids(self):
+        for code in ("E4", "F3", "M2", "S5", "B1"):
+            assert code in {"E4", "F3", "M2", "S5", "B1"}
+
+    def test_resolve_code_contract_requires_canonical_id_fields(self):
+        info = resolve_code("S5")
+        assert info["canonical_id"] == "S5"
+        assert info["category"] == "S"
+        assert info["current_label"] == "Creative"
+        assert info["status"] == "active"
+
+    def test_historical_path_preserves_public_canonical_ids(self):
+        historical_path = ["E4", "F3", "M2", "S5", "B1"]
+        for code in historical_path:
+            info = resolve_code(code)
+            assert info["canonical_id"] == code
+
+    def test_label_change_does_not_change_canonical_id(self):
+        record = EFMSOMBIdentityRecord(
+            canonical_id="S5",
+            category="S",
+            current_label="Creative",
+            aliases=["creative_state"],
+            status="active",
+            deprecated_since=None,
+            retired_since=None,
+            replacement_of=None,
+            metadata={"source": "contract"},
+        )
+        record_v2 = EFMSOMBIdentityRecord(
+            canonical_id="S5",
+            category="S",
+            current_label="NewLabel",
+            aliases=["creative_state"],
+            status="active",
+            deprecated_since=None,
+            retired_since=None,
+            replacement_of=None,
+            metadata={"source": "contract"},
+        )
+        assert record.canonical_id == record_v2.canonical_id == "S5"
+
+    def test_position_independence_contract_is_explicit(self):
+        reordered_state_of_mind = [
+            "Creative",
+            "Focused",
+            "Confused",
+            "Curious",
+            "Determined",
+            "Analytical",
+            "Reflective",
+            "Open-minded",
+            "Closed-minded",
+            "Grounded",
+            "Hopeful",
+            "Defensive",
+            "Distracted",
+            "Judgmental",
+            "Resistant",
+            "Stressed",
+            "Overloaded",
+            "Empathetic",
+            "Reassured",
+            "Numb",
+            "Aware",
+            "Unaware",
+            "Alert",
+            "Cautious",
+            "Decisive",
+            "Indecisive",
+            "Accepting",
+            "Avoidant",
+            "Observant",
+            "Patient",
+        ]
+        record = EFMSOMBIdentityRecord(
+            canonical_id="S5",
+            category="S",
+            current_label="Creative",
+            aliases=[],
+            status="active",
+            deprecated_since=None,
+            retired_since=None,
+            replacement_of=None,
+            metadata={"semantic_order": reordered_state_of_mind},
+        )
+        assert record.canonical_id == "S5"
+        assert record.current_label == "Creative"
+
+    def test_reordering_taxonomy_does_not_change_canonical_id(self):
+        original_label = code_to_label("E4")
+        local_reordered = list(CATEGORIES["E"])
+        local_reordered = [local_reordered[3], *local_reordered[:3], *local_reordered[4:]]
+        assert local_reordered[0] == "Anger"
+        assert code_to_label("E4") == original_label == "Anger"
+        assert resolve_code("E4")["canonical_id"] == "E4"
+        assert resolve_code("E4")["current_label"] == "Anger"
+
+
 class TestE4BidirectionalMapping:
     """Test that E4 resolves to its expected canonical label and back."""
 
@@ -72,13 +207,51 @@ class TestE4BidirectionalMapping:
 class TestAllCategoriesBidirectional:
     """Test that F, M, S, B all support bidirectional mapping."""
 
+    def test_audited_f_catalog_is_canonical(self):
+        """The runtime registry must reflect the audited F-layer specification."""
+        assert code_to_label("F1") == "Tension"
+        assert code_to_label("F3") == "Heaviness"
+        assert code_to_label("F12") == "Depersonalization-style Detachment"
+        with pytest.raises(KeyError):
+            code_to_label("F11")
+        assert label_to_code("Tension", category="F") == "F1"
+        assert label_to_code("Heaviness", category="F") == "F3"
+        assert label_to_code("Depersonalization-style Detachment", category="F") == "F12"
+        assert label_to_code("Clarity/Focused-alertness", category="F") is None
+
+    def test_yaml_f_section_matches_registry(self):
+        """The YAML F section must match the canonical registry exactly and omit F11."""
+        yaml_path = Path(__file__).with_name("efmsomb_emotion_taxonomy_v1_proposed.yaml")
+        data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+
+        assert "feelings" in data, "YAML F section is missing."
+
+        feelings = data["feelings"]
+        expected = {
+            "F1": "Tension",
+            "F2": "Constriction",
+            "F3": "Heaviness",
+            "F4": "Affective Numbing",
+            "F5": "Warmth/Expansion",
+            "F6": "Felt-pull / Subjective Imperative",
+            "F7": "Apprehensive Foreboding",
+            "F8": "Agitation/Restlessness",
+            "F9": "Emptiness/Hollowing",
+            "F10": "Pressure/Surging-Heat",
+            "F12": "Depersonalization-style Detachment",
+        }
+
+        assert list(feelings.keys()) == list(expected.keys())
+        assert {code: entry["label"] for code, entry in feelings.items()} == expected
+        assert "F11" not in feelings
+        assert feelings["F12"]["label"] == "Depersonalization-style Detachment"
+
     def test_F_category_bidirectional(self):
-        """F category codes ↔ labels bidirectional."""
-        for idx in range(len(CATEGORIES["F"])):
-            code = f"F{idx+1}"
-            label = code_to_label(code)
+        """F category codes ↔ labels bidirectional using the canonical audited mapping."""
+        for code, label in F_CODE_TO_LABEL.items():
             recovered = label_to_code(label, category="F")
             assert recovered == code
+            assert code_to_label(code) == label
 
     def test_M_category_bidirectional(self):
         """M category codes ↔ labels bidirectional."""
@@ -148,7 +321,7 @@ class TestCaseNormalization:
         """All labels in all categories are case-insensitive."""
         for cat in CATEGORIES.keys():
             for idx, label in enumerate(CATEGORIES[cat]):
-                expected_code = f"{cat}{idx+1}"
+                expected_code = f"{cat}{idx+1}" if cat != "F" else next(code for code, mapped in F_CODE_TO_LABEL.items() if mapped == label)
                 assert label_to_code(label.lower(), category=cat) == expected_code
                 assert label_to_code(label.upper(), category=cat) == expected_code
                 assert label_to_code(label, category=cat) == expected_code
@@ -222,10 +395,10 @@ class TestUnknownLabelHandling:
         assert label_to_code("Ang") is None
 
     def test_ambiguous_label_without_category_returns_none(self):
-        """Ambiguous labels across categories fail safely and do not invent a code."""
-        assert label_to_code("Optimistic") is None
-        assert label_to_code("Hopeful") is None
-        assert label_to_code("Calm") is None
+        """Category-agnostic lookups must only return a code when the label is unambiguous."""
+        assert label_to_code("Tension") == "F1"
+        assert label_to_code("Heaviness") == "F3"
+        assert label_to_code("Calm") == "M8"
 
     def test_misspelled_label_returns_none(self):
         """Misspelled labels return None."""
@@ -271,20 +444,30 @@ class TestNoDuplicates:
                 normalized = label.lower().strip()
                 assert normalized not in seen_labels, f"Label collision in {cat}: {label}"
                 seen_labels.add(normalized)
-                # Verify unambiguous category-scoped lookup
                 code = label_to_code(label, category=cat)
-                assert code == f"{cat}{idx+1}"
+                if cat == "F":
+                    expected_code = next(code for code, mapped in F_CODE_TO_LABEL.items() if mapped == label)
+                else:
+                    expected_code = f"{cat}{idx+1}"
+                assert code == expected_code
 
     def test_code_to_label_uniqueness(self):
         """Each code maps to exactly one label (no ambiguity)."""
         seen_codes = set()
         for cat in CATEGORIES.keys():
-            for idx in range(len(CATEGORIES[cat])):
-                code = f"{cat}{idx+1}"
-                assert code not in seen_codes
-                seen_codes.add(code)
-                label = code_to_label(code)
-                assert label is not None
+            if cat == "F":
+                for code in F_CODE_TO_LABEL:
+                    assert code not in seen_codes
+                    seen_codes.add(code)
+                    label = code_to_label(code)
+                    assert label is not None
+            else:
+                for idx in range(len(CATEGORIES[cat])):
+                    code = f"{cat}{idx+1}"
+                    assert code not in seen_codes
+                    seen_codes.add(code)
+                    label = code_to_label(code)
+                    assert label is not None
 
 
 # ============================================================

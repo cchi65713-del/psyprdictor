@@ -60,3 +60,52 @@ def test_learning_bridge_preserves_manual_learning_pattern_without_changing_habi
     assert diag["memory_updated"] is True
     assert diag["habit_strength_updated"] is True
     assert len(learner.get_all_patterns()) >= 1
+
+
+def test_experience_accepts_optional_efmsomb_snapshot():
+    efmsomb = {
+        "emotion": {"label": "anger", "code": "E4"},
+        "feeling": {"label": "disrespected", "code": "F3"},
+    }
+    exp = Experience(
+        path=["E4", "F3", "M2"],
+        intensity=8,
+        context="snapshot test",
+        outcome="B1",
+        efmsomb=efmsomb,
+    )
+
+    assert exp.efmsomb == efmsomb
+    assert exp.path == ["E4", "F3", "M2"]
+    assert exp.outcome == "B1"
+
+
+def test_learning_bridge_records_optional_efmsomb_snapshot():
+    person = PersonState("P2")
+    person.efmsomb = {
+        "emotion": {"label": "anger", "code": "E4"},
+        "feeling": {"label": "disrespected", "code": "F3"},
+        "mood": {"label": "irritated", "code": "M2"},
+        "state_of_mind": {"label": "defensive", "code": "S5"},
+        "behavior": {"label": "respond_immediately", "code": "B1"},
+    }
+    memory = Memory()
+    learner = PatternLearner()
+    memory.connect_pattern_learner(learner)
+    bridge = LearningBridge()
+
+    diag = bridge.record_execution(
+        person_state=person,
+        person_id="P2",
+        chosen_action="RespondImmediately",
+        actual_outcome="B1",
+        pattern_id="E4.F3.M2.S5.B1",
+        pattern_path=["E4", "F3", "M2", "S5", "B1"],
+        context="snapshot flow",
+        memory=memory,
+    )
+
+    assert len(memory.experiences) == 1
+    assert memory.experiences[0].efmsomb == person.efmsomb
+    assert memory.experiences[0].path == ["E4", "F3", "M2", "S5", "B1"]
+    assert diag["outcome"] == "B1"

@@ -1,0 +1,104 @@
+### Runtime / supporting state dimensions (NOT S-layer canonical semantics)
+# This file captures state variables and dimensions used by runtime code.
+# These are supporting variables and are not part of the frozen S-layer.
+
+dimensions_version: 1
+description: |
+  Supporting runtime state/dimensions and their suggested typing. These
+  attributes are kept separate from the S-layer freeze. Verified runtime
+  mappings will be established during the reconciliation audit.
+
+dimensions:
+  awareness:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Agent's current perceptual availability to environmental input; 0=none, 1=fully aware"
+    runtime_mapping: PersonState.state.perception.awareness
+    default: 0.5
+
+  attention:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Allocation of processing capacity toward a stimulus or task; 0=not attending, 1=fully attending"
+    runtime_mapping: PersonState.state.attention
+    default: 0.2
+
+  arousal:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Physiological/activation intensity influencing readiness to act; 0=low, 1=high"
+    runtime_mapping: PersonState.state.arousal
+    default: 0.3
+
+  mood:
+    type: string
+    allowed_values: [neutral, positive, negative]
+    persistence: semi-stable
+    description: "Low-frequency affective background state influencing appraisal bias"
+    runtime_mapping: PersonState.state.mood
+    default: neutral
+
+  valence:
+    type: float
+    range: [-1.0, 1.0]
+    persistence: dynamic
+    description: "Affective valence from negative (-1) to positive (+1). Used in appraisal/emotion mapping."
+    runtime_mapping: PersonState.state.valence
+    default: 0.0
+
+  dominance:
+    type: float
+    range: [-1.0, 1.0]
+    persistence: dynamic
+    description: "Sense of control or influence over events; -1=powerless, +1=in-control"
+    runtime_mapping: PersonState.state.dominance
+    default: 0.0
+
+  confidence:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Belief in the correctness of a current inference or choice"
+    runtime_mapping: PersonState.meta.confidence
+    default: 0.5
+
+  uncertainty:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Estimated epistemic uncertainty about predictions or beliefs"
+    runtime_mapping: SystemMemory.uncertainty_estimate
+    default: 0.5
+
+  engagement:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Task/goal-oriented engagement level; affects goal priority and persistence"
+    runtime_mapping: PersonState.state.engagement
+    default: 0.0
+
+  habit_bias:
+    type: float
+    range: [0.0, 1.0]
+    persistence: semi-stable
+    description: "Tendency to favor habitual action selection over deliberative choice"
+    runtime_mapping: PersonState.habit_strength
+    default: 0.2
+
+  social_salience:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "How socially relevant current context/stimulus is perceived to be"
+    runtime_mapping: PersonState.state.social_salience
+    default: 0.0
+
+notes: |
+  - This file contains suggested typing and the current preferred runtime
+    mapping hints. The runtime_mappings here are provisional and must be
+    verified during the runtime reconciliation audit; they are not part of the
+    semantic freeze.

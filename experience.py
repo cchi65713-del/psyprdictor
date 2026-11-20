@@ -9,7 +9,8 @@ class Experience:
         intensity,
         context,
         outcome,
-        timestamp=None
+        timestamp=None,
+        efmsomb=None
     ):
 
         self.path = path
@@ -23,6 +24,11 @@ class Experience:
             self.timestamp = datetime.now()
         else:
             self.timestamp = timestamp
+
+        # Optional snapshot of canonical EFMSOMB metadata (dict or None).
+        # This is intentionally optional and preserved for downstream
+        # components that may rely on the runtime EFMSOMB snapshot.
+        self.efmsomb = efmsomb
 
     # ==========================================
     # INTENSITY WEIGHT

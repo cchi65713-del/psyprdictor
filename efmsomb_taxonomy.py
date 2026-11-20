@@ -166,6 +166,17 @@ EMOTION_STARTER = [
 
 
 FEELING_STARTER = [
+    "tension",
+    "constriction",
+    "heaviness",
+    "affective numbing",
+    "warmth/expansion",
+    "felt-pull / subjective imperative",
+    "apprehensive foreboding",
+    "agitation/restlessness",
+    "emptiness/hollowing",
+    "pressure/surging-heat",
+    "depersonalization-style detachment",
     "disrespected",
     "threatened",
     "dismissed",

@@ -135,6 +135,8 @@ class PersonModelContract:
         self.layers["dynamic"]["arousal"] = getattr(person_state, "arousal", 0.0)
         self.layers["dynamic"]["regulation"] = getattr(person_state, "state_regulation", getattr(person_state, "self_regulation", 0.5))
         self.layers["dynamic"]["attention"] = attention
+        # Expose the structured EFMSOMB canonical runtime representation if present
+        self.layers["dynamic"]["efmsomb"] = getattr(person_state, "efmsomb", {})
 
         self.layers["learning"]["memory"] = memory
         self.layers["learning"]["habits"] = habit_strength

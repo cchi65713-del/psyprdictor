@@ -10,7 +10,16 @@ learning modules.
 """
 from typing import Any, Dict, List
 
+from efmsomb_taxonomy import (
+    BehaviorSignature,
+    EmotionState,
+    FeelingState,
+    MoodState,
+    StateOfMindState,
+)
 from person_model_contract import PersonModelContract
+from efmsomb_registry import label_to_code, code_to_label
+import re
 
 
 class PersonState:
@@ -114,6 +123,11 @@ class PersonState:
         # Meaning attribution layer
         self.meanings: List[Any] = []
 
+        # Structured canonical EFMSOMB runtime representation
+        # Keys: emotion, feeling, mood, state_of_mind, behavior
+        # Each value is a dict with at minimum: label, code, and any preserved metadata
+        self.efmsomb: Dict[str, Dict[str, Any]] = {}
+
     def sync_person_model(self):
         """Keep the explicit person-model contract aligned with the runtime state."""
         self.person_model.sync_from_person_state(self)
@@ -159,6 +173,194 @@ class PersonState:
         if behavior is not None:
             self.behavior = behavior
         self.sync_person_model()
+
+    def apply_efmsomb_taxonomy(
+        self,
+        *,
+        emotion_state: EmotionState | None = None,
+        feeling_state: FeelingState | None = None,
+        mood_state: MoodState | None = None,
+        state_of_mind_state: StateOfMindState | None = None,
+        behavior_state: BehaviorSignature | None = None,
+    ):
+        """Map EFMSOMB dataclass objects into the canonical dynamic person state.
+
+        This is intentionally an adapter layer: the legacy EFMSOMB fields remain
+        available for compatibility, while the canonical dynamic fields remain the
+        real architecture sink.
+        """
+        warnings: List[str] = []
+
+        def _resolve_label_code(value: str | None, category: str):
+            """Return (label, code, warning_or_None).
+
+            Accepts either a human-readable label or a canonical code and
+            resolves the counterpart via the registry. Does not raise on
+            unresolved labels; instead returns code=None and a warning.
+            """
+            if value is None:
+                return None, None, None
+            s = str(value).strip()
+            if not s:
+                return None, None, None
+            # If it looks like a code (e.g., E4, S5.1), treat as code
+            if re.match(r'^[EFMSBefmsb]\d+(?:\..+)?$', s):
+                code = s.upper()
+                try:
+                    label = code_to_label(code)
+                    return label, code, None
+                except KeyError:
+                    return s, code, f"Invalid code: {code}"
+            # Otherwise treat as label
+            label = s
+            code = label_to_code(label, category=category)
+            if code is None:
+                return label, None, f"Unknown label for category {category}: {label}"
+            return label, code, None
+
+        resolved = {}
+
+        if emotion_state is not None:
+            label_input = getattr(emotion_state, "label", None)
+            label, code, warn = _resolve_label_code(label_input, "E")
+            if warn:
+                warnings.append(warn)
+            emo = {
+                "label": label,
+                "code": code,
+                "intensity": getattr(emotion_state, "intensity", None),
+                "valence": getattr(emotion_state, "valence", None),
+                "confidence": getattr(emotion_state, "confidence", None),
+                "trigger_ref": getattr(emotion_state, "trigger_ref", None),
+                "timestamp": getattr(emotion_state, "timestamp", None),
+            }
+            self.efmsomb["emotion"] = emo
+            self.state_emotion = [
+                {k: emo.get(k) for k in ("label", "intensity", "valence", "confidence", "trigger_ref", "timestamp")}
+            ]
+            self.emotion = emo.get("label")
+            resolved["emotion"] = emo
+
+        if feeling_state is not None:
+            label_input = getattr(feeling_state, "quality", None)
+            label, code, warn = _resolve_label_code(label_input, "F")
+            if warn:
+                warnings.append(warn)
+            feel = {
+                "label": label,
+                "code": code,
+                "texture": getattr(feeling_state, "texture", None),
+                "intensity": getattr(feeling_state, "intensity", None),
+                "salience": getattr(feeling_state, "salience", None),
+                "source_ref": getattr(feeling_state, "source_ref", None),
+            }
+            self.efmsomb["feeling"] = feel
+            self.feeling = feel.get("label")
+            self.state_appraisal = {
+                **self.state_appraisal,
+                "felt_quality": feel.get("label"),
+                "texture": feel.get("texture"),
+                "salience": feel.get("salience"),
+                "source_ref": feel.get("source_ref"),
+            }
+            resolved["feeling"] = feel
+
+        if mood_state is not None:
+            label_input = getattr(mood_state, "tone", None)
+            label, code, warn = _resolve_label_code(label_input, "M")
+            if warn:
+                warnings.append(warn)
+            m = {
+                "label": label,
+                "code": code,
+                "intensity": getattr(mood_state, "intensity", None),
+                "drift": getattr(mood_state, "drift", None),
+                "decay": getattr(mood_state, "decay", None),
+                "baseline_anchor": getattr(mood_state, "baseline_anchor", None),
+            }
+            self.efmsomb["mood"] = m
+            self.mood = m.get("label")
+            self.state_appraisal = {
+                **self.state_appraisal,
+                "mood_tone": m.get("label"),
+                "mood_intensity": m.get("intensity"),
+                "mood_drift": m.get("drift"),
+                "mood_decay": m.get("decay"),
+            }
+            resolved["mood"] = m
+
+        if state_of_mind_state is not None:
+            label_input = getattr(state_of_mind_state, "frame", None)
+            label, code, warn = _resolve_label_code(label_input, "S")
+            if warn:
+                warnings.append(warn)
+            som = {
+                "label": label,
+                "code": code,
+                "regulation_mode": getattr(state_of_mind_state, "regulation_mode", None),
+                "cognitive_bias": getattr(state_of_mind_state, "cognitive_bias", None),
+                "control_level": getattr(state_of_mind_state, "control_level", None),
+                "flexibility": getattr(state_of_mind_state, "flexibility", None),
+            }
+            self.efmsomb["state_of_mind"] = som
+            self.state_of_mind = {
+                "frame": som.get("label"),
+                "regulation_mode": som.get("regulation_mode"),
+                "cognitive_bias": som.get("cognitive_bias"),
+                "control_level": som.get("control_level"),
+                "flexibility": som.get("flexibility"),
+            }
+            self.state_regulation = float(som.get("control_level") or self.state_regulation)
+            self.self_regulation = float(som.get("control_level") or self.self_regulation)
+            self.state_appraisal = {
+                **self.state_appraisal,
+                "state_of_mind_frame": som.get("label"),
+                "regulation_mode": som.get("regulation_mode"),
+                "cognitive_bias": som.get("cognitive_bias"),
+                "state_flexibility": som.get("flexibility"),
+            }
+            resolved["state_of_mind"] = som
+
+        if behavior_state is not None:
+            label_input = getattr(behavior_state, "signature", None)
+            label, code, warn = _resolve_label_code(label_input, "B")
+            if warn:
+                warnings.append(warn)
+            beh = {
+                "label": label,
+                "code": code,
+                "mode": getattr(behavior_state, "mode", None),
+                "confidence": getattr(behavior_state, "confidence", None),
+                "intensity": getattr(behavior_state, "intensity", None),
+                "context_ref": getattr(behavior_state, "context_ref", None),
+                "outcome_ref": getattr(behavior_state, "outcome_ref", None),
+            }
+            self.efmsomb["behavior"] = beh
+            self.behavior = beh.get("label")
+            self.action_tendencies = {
+                **self.action_tendencies,
+                "behavior_signature": beh.get("label"),
+                "behavior_mode": beh.get("mode"),
+            }
+            resolved["behavior"] = beh
+
+        # Keep the top-level legacy fields in sync (already set above per-dimension)
+        self.sync_person_model()
+        # Return a compatibility-friendly flat mapping that preserves the
+        # legacy shape expected by tests and external callers. Include both
+        # the concise top-level labels (emotion/feeling/mood/behavior) and
+        # the richer structured `resolved` map plus any warnings.
+        return {
+            "emotion": self.emotion,
+            "feeling": self.feeling,
+            "mood": self.mood,
+            "behavior": self.behavior,
+            "state_emotion": self.state_emotion,
+            "state_appraisal": self.state_appraisal,
+            "state_regulation": self.state_regulation,
+            "resolved": resolved,
+            "warnings": warnings,
+        }
 
     def update(self, **kwargs):
         """Convenience updater: supports context and EFMSOMB keys plus any existing attribute."""

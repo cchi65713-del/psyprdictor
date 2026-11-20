@@ -1,0 +1,380 @@
+taxonomy:
+  name: EFMSOMB Emotion Taxonomy
+  layer: E
+  version: 1.3.0
+  version_history: |
+    - 1.1.0: PROPOSED (prior)
+    - 1.2.0: Boundary-purity audit applied; Level-2 nodes pruned and reworded.
+    - 1.3.0: E-layer boundary rule recalibrated; 4 nodes restored (E3.2, E14.3, E17.2, E29.2). E-layer FROZEN.
+  status: FROZEN (E-layer recalibrated and locked; F-layer section synchronized to specification)
+  canonical_base_layer: E
+  canonical_codes: E1-E30
+  notes:
+    - "Level-2 nodes are semantic facets/subtypes. Intensity is metadata, not a taxonomy node."
+    - "Behavior, regulation, physiology, cognition, motivation, and appraisal/context are not represented as E Level-2 nodes; where such concepts appeared on audit they were relocated or marked for review."
+    - "E-LAYER BOUNDARY RULE (v1.3.0 calibrated): A Level-2 node is valid if it describes a genuinely distinct form/facet/quality of the canonical emotion's intrinsic affective character, incorporating relational, temporal, sensory, or intensity dimensions if they create real emotional form variation. Invalid nodes describe pure trigger/target, behavioral tendency, physiological expression, or phenomenological quality (reserved for F-layer)."
+    - "FORM-GENERATION TEST: Does the contextual distinction merely indicate cause/target, or does it reorganize the emotional experience into a stable, qualitatively distinct mode that persists when the original situation is abstracted away? PASS → keep/reword; FAIL → move out."
+    - "F-LAYER ARCHITECTURE DECISION: ADOPT OPTION C — an independent, orthogonal library of felt-quality descriptors (e.g., tension, heaviness, expansion, numbness) that can be associated with multiple E-layer emotions."
+    - "F-LAYER BOUNDARY RULE: F entries must describe phenomenological felt qualities (subjective experiential modes) that are not themselves emotions. Do NOT include intensity, appraisal, behavior, physiology, or triggers as F nodes. Intensity is a separate parameter attached to states, not an F-node."
+    - "F-LAYER GUARDRAIL: The E-layer is FROZEN; do not create or modify F-layer node definitions that implicitly reintroduce E-layer distinctions (no new emotion-like taxa under F). Any proposed F nodes must be reviewed against the FORM-GENERATION TEST and approved by SME before being added."
+    - "F-LAYER SERIALIZATION STATUS: The YAML F section is intentionally synchronized to F_LAYER_SPECIFICATION.md and excludes F11, which is reserved for the S-layer. The YAML acts as a structured interchange representation, not as an independent semantic authority."
+
+emotions:
+  E1:
+    label: Joy
+    definition: Positive affect characterized by feelings of pleasure, reward, and contentment.
+    level_2:
+      E1.3:
+        label: Sensory/hedonic pleasure
+        definition: Joy deriving from immediate sensory pleasure or hedonic experiences.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E2:
+    label: Sadness
+    definition: Low‑valence affect associated with loss, separation, and disappointment.
+    level_2:
+      E2.1:
+        label: Loss‑focused sadness
+        definition: Sadness primarily centered on bereavement or separation.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E3:
+    label: Fear
+    definition: High‑salience negative affect associated with perceived threat or danger.
+    level_2:
+      E3.1:
+        label: Immediate threat fear
+        definition: Fear in response to an acute, present danger.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E3.2:
+        label: Anticipatory threat fear
+        definition: Fear of potential or future danger; distinct temporal mode involving imaginative threat projection.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E4:
+    label: Anger
+    definition: High‑salience negative affect often linked to perceived wrongdoing, obstruction, or boundary violation.
+    level_2:
+      E4.1:
+        label: Injustice/violation anger
+        definition: Anger characterized by perceived unfairness, insult, or violation of an important boundary.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E5:
+    label: Disgust
+    definition: Aversion‑related affect often signaling contamination, revulsion, or moral disgust.
+    level_2:
+      E5.1:
+        label: Core/physical disgust
+        definition: Disgust linked to contamination or revulsion.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E5.2:
+        label: Moral/social disgust
+        definition: Disgust in response to moral violations or social transgressions.
+        status: PROPOSED
+        review:
+          suggested_action: REWORD/RETAIN (provisional KEEP)
+          rationale: "Likely represents a distinct social/moral mode of disgust (distinct appraisal, distancing and moral condemnation). Recommend rewording to emphasize phenomenological features that go beyond trigger semantics (e.g., sustained moralized rejection, purity-violation imagery). Apply FORM-GENERATION TEST."
+        facet_type: intrinsic_emotion_subtype
+
+  E6:
+    label: Surprise
+    definition: Brief affective response to unexpected events or violations of expectations.
+    level_2: {}
+
+  E7:
+    label: Excitement
+    definition: High‑arousal positive affect associated with energization and anticipatory pleasure.
+    level_2: {}
+
+  E8:
+    label: Love
+    definition: Complex social affect encompassing attachment, care, and passionate bonds.
+    level_2: {}
+
+  E9:
+    label: Affection
+    definition: Low‑arousal positive social warmth and liking.
+    level_2:
+      E9.1:
+        label: Warm liking
+        definition: Pleasant social warmth and fondness.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E9.3:
+        label: Tenderness
+        definition: Gentle affective softening often toward vulnerability.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E10:
+    label: Grief
+    definition: Deep sorrow linked to significant loss and mourning.
+    level_2:
+      E10.1:
+        label: Acute bereavement reaction
+        definition: Immediate, intense grief following a major loss.
+        status: PROPOSED
+        review:
+          suggested_action: REWORD/POSSIBLE_MOVE
+          rationale: "May reflect intensity/temporal profile of canonical grief rather than a distinct qualitative mode. Keep only if YAML establishes unique phenomenological form (discrete intrapsychic organization beyond 'intense' label). Apply FORM-GENERATION TEST."
+        facet_type: intrinsic_emotion_subtype
+
+  E11:
+    label: Anxiety
+    definition: Negative affect characterized by anticipatory tension and heightened vigilance.
+    level_2:
+      E11.1:
+        label: Anticipatory anxiety
+        definition: Anxiety characterized by a forward-looking tension about possible future threat or uncertainty, experienced as diffuse apprehension rather than as a discrete external trigger.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E12:
+    label: Frustration
+    definition: Negative affect arising from goal obstruction or repeated interference.
+    level_2:
+      E12.1:
+        label: Acute goal‑block frustration
+        definition: Frustration from immediate blocking of goals.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E12.2:
+        label: Repetitive/minor obstruction
+        definition: Low‑level, chronic frustration from frequent minor obstacles.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E13:
+    label: Irritation
+    definition: Low‑grade negative affect often prompted by annoying stimuli or disruptions.
+    level_2:
+      E13.1:
+        label: Sensory irritation
+        definition: Irritation from sensory annoyances (noise, discomfort).
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E13.3:
+        label: Persistent annoyance
+        definition: Low‑grade ongoing irritation.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E14:
+    label: Resentment
+    definition: Sustained negative affect involving perceived injustice and accumulated grievance.
+    level_2:
+      E14.3:
+        label: Relational bitterness
+        definition: Resentment rooted in betrayed trust or broken relationship bonds; intrinsically different from resentment toward generic injustice.
+        status: PROPOSED
+        review:
+          suggested_action: RE-AUDIT (critical)
+          rationale: "Requires explicit justification for why betrayal/relational context reorganizes the affect into a distinct mode rather than merely specifying target/trigger. If preserved, provide phenomenological markers (distinct appraisal pattern, unique temporal profile, interpersonal action tendencies) and demonstrate FORM-GENERATION TEST pass."
+        facet_type: intrinsic_emotion_subtype
+
+  E15:
+    label: Guilt
+    definition: Negative moral affect tied to responsibility and perceived wrongdoing.
+    level_2:
+      E15.1:
+        label: Agentive guilt
+        definition: Guilt experienced as a self-attributed burden when the person feels personally causally responsible for harm, emphasizing agency as part of the emotion’s felt form.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E16:
+    label: Shame
+    definition: Self‑focused negative affect involving exposure, devaluation, or social failure.
+    level_2: {}
+
+  E17:
+    label: Pride
+    definition: Positive self‑evaluative affect associated with achievement and status.
+    level_2:
+      E17.1:
+        label: Achievement pride
+        definition: Pride tied to personal accomplishments.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+      E17.2:
+        label: Collective/group pride
+        definition: Pride rooted in group accomplishment or collective identity; structurally distinct from individual achievement pride through shared consciousness of group accomplishment.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E18:
+    label: Relief
+    definition: Positive affect following the removal or reduction of threat, tension, or uncertainty.
+    level_2:
+      E18.1:
+        label: Threat‑resolution relief
+        definition: Relief felt when a previously present threat or danger is removed.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E19:
+    label: Hope
+    definition: Positive anticipatory affect oriented toward desirable future outcomes.
+    level_2: {}
+
+  E20:
+    label: Despair
+    definition: Deep negative affect characterized by pervasive hopelessness or helplessness.
+    level_2: {}
+
+  E21:
+    label: Envy
+    definition: Displeasure or desire arising from another's advantage or possession.
+    level_2: {}
+
+  E22:
+    label: Jealousy
+    definition: Social affect centered on perceived threat to valued relationships.
+    level_2:
+      E22.1:
+        label: Possessive jealousy
+        definition: Jealousy characterized by possessive exclusivity toward a valued bond.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E23:
+    label: Contempt
+    definition: Dismissive negative affect often signaling moral or social rejection.
+    level_2:
+      E23.3:
+        label: Dismissive contempt
+        definition: Contempt characterized by devaluation, dismissive low regard, and psychological distancing toward individuals or groups regarded as beneath respect.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E24:
+    label: Admiration
+    definition: Positive affect in response to perceived excellence, skill, or virtue.
+    level_2: {}
+
+  E25:
+    label: Amazement
+    definition: Strong surprise often accompanied by wonder or astonishment.
+    level_2: {}
+
+  E26:
+    label: Curiosity
+    definition: Epistemic positive affect associated with desire to acquire information.
+    level_2: {}
+
+  E27:
+    label: Empathy
+    definition: Other‑oriented affect involving resonance and understanding of another's emotional state.
+    level_2:
+      E27.1:
+        label: Affective resonance
+        definition: Feeling with another, sharing in their emotional state.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E28:
+    label: Compassion
+    definition: Concerned, other‑oriented affect focused on alleviating suffering.
+    level_2:
+      E28.1:
+        label: Compassionate concern
+        definition: Compassion characterized by focused concern for another's suffering (emotional core, distinct from enacted helping behavior).
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+
+  E29:
+    label: Embarrassment
+    definition: Self‑conscious negative affect due to social slip or exposure.
+    level_2:
+      E29.2:
+        label: Anticipatory embarrassment
+        definition: Forward-looking dread of potential social exposure or embarrassment; distinct temporal mode involving imagined embarrassing scenario.
+        status: PROPOSED
+        facet_type: intrinsic_emotion_subtype
+  E30:
+    label: Anticipation
+    definition: Emotionally charged expectation of a meaningful future event.
+    level_2: {}
+
+feelings:
+  F1:
+    label: Tension
+    definition: A felt strain or pull in the body/mind, experienced as internal tightness, muscular load, or unresolved activation.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F2:
+    label: Constriction
+    definition: A subjective narrowing or closing of the self, perceptual field, or inner space; the sense of being boxed in or reduced.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F3:
+    label: Heaviness
+    definition: A felt burden, weightedness, or drag that slows inner movement and makes the experience feel physically and emotionally loaded.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F4:
+    label: Affective Numbing
+    definition: Reduced responsiveness or emotional contact; a dampening or deadening of affective access that blunts feeling and reactivity.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F5:
+    label: Warmth/Expansion
+    definition: A felt opening, softening, or upward/broadening quality; sense of ease, radiance, or inner release.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F6:
+    label: Felt-pull / Subjective Imperative
+    definition: "An internal directional force: the sense that something is compelling, urgent, or action-leaning without yet being a fully articulated plan or explicit behavior."
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F7:
+    label: Apprehensive Foreboding
+    definition: A diffuse, looming anticipation of negative outcome, experienced as a sense that something bad is coming even before a precise threat is named.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F8:
+    label: Agitation/Restlessness
+    definition: "A disturbed kinetic quality: inner turbulence, inability to settle, urge to move, discharge, or escalate."
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F9:
+    label: Emptiness/Hollowing
+    definition: A void-like or depleted inner quality, often experienced as missingness, loss of pressure, or inner absence.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F10:
+    label: Pressure/Surging-Heat
+    definition: A rise of internal force, heat, and buildup that feels like pressure or escalation beneath the surface.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+  F12:
+    label: Depersonalization-style Detachment
+    definition: A felt estrangement from the self, as if the person is observing from outside or the self feels strangely absent, diffuse, or not fully present.
+    status: APPROVED
+    facet_type: phenomenological_felt_quality
+
+review:
+  summary: |
+    The taxonomy preserves canonical E1–E30 codes and marks all Level‑2 nodes as PROPOSED. Borderline nodes that were retained for SME review are flagged with concise review notes. Physiology, cognition, motivation, regulation, behavior and appraisal/context concepts were generally relocated or flagged; when a Level‑2 node includes borderline language it was either reframed or given a review note. The F-layer section is synchronized to the approved F specification and intentionally excludes F11, which has been migrated to the S-layer.
+  borderline_nodes:
+    - E4.1
+    - E15.2
+    - E22.3
+    - E24.2
+    - E26.1
+    - E28.2
+  metadata:
+    taxonomy_version: 1.3.0
+    status: FROZEN (E-layer with synchronized F-section)
+    canonical_base_layer: E
+    canonical_codes_count: 30
+    level_2_node_count: 25
+    f_layer_status: synchronized_to_F_LAYER_SPECIFICATION
+    notes: "E-layer version 1.3.0: Recalibrated boundary rule applied. Contains 25 Level-2 nodes (21 survivors from purity audit + 4 restored nodes representing genuinely distinct emotion forms: E3.2 anticipatory fear, E14.3 relational bitterness, E17.2 collective pride, E29.2 anticipatory embarrassment). All nodes represent intrinsic emotion subtypes, forms, facets, or modes. The F section is intentionally aligned to the approved F specification and excludes F11 because it was migrated to the S layer."

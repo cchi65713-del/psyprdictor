@@ -1,0 +1,335 @@
+### S-layer canonical registry (freeze)
+# Version: 1
+# This file contains only the frozen S-layer semantics (interpretive/regulatory postures).
+
+s_layer_version: 1
+description: |
+  Canonical S-layer (State-of-Mind) vocabulary used to freeze semantics for
+  architecture and runtime audits. This file is intentionally limited to S
+  semantics (definitions, boundary tests, examples) and DOES NOT include
+  runtime mappings or supporting state/dimensions.
+
+s_layer:
+  metadata:
+    name: "StateOfMind (S)"
+    definition: "Interpretive/regulatory posture describing how a person temporarily organizes attention, openness, and response strategy. NOT an emotion, feeling, mood, trait, appraisal conclusion, or observable behavior."
+    boundary_tests:
+      - form_generation: "Remove situation/object — label still names a recognizable temporary posture? (PASS/FAIL)"
+      - situation_removal: "Strip event/appraisal content — remaining concept still a temporary posture? (PASS/FAIL)"
+      - layer_purity: "Avoid valence, bodily feeling, habitual trait, appraisal outcome, or observable action."
+
+  canonical_entries:
+    - id: S3
+      label: Curious
+      status: KEEP
+      summary: "Receptive exploratory attention; transient orientation to seek information and broaden hypotheses."
+      definition: "A temporary, information-seeking posture that prioritizes broadened attention and hypothesis sampling for the episode. Organizes exploration strategies but is not an emotion or a trait."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Receptive exploratory attention toward unknown options"
+      notes: "Defined as an episode-level exploratory mode; wording avoids causal mechanisms."
+
+    - id: S8
+      label: Open-minded
+      status: KEEP
+      summary: "Temporarily increased receptivity to alternatives and evidence; lowers immediate dismissal of alternatives."
+      definition: "An episodic receptivity posture that widens acceptance thresholds for novel evidence and reduces immediate dismissal of alternatives; affects evidence-weighting and attention without implying trait-level openness."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Momentary willingness to consider a colleague's opposing view"
+      notes: "Explicitly episode-limited; do not conflate with personality trait."
+
+    - id: S9
+      label: Closed-minded
+      status: KEEP
+      summary: "Temporary narrowing of acceptable perspectives; increased confirmatory stance."
+      definition: "A transient regulatory posture that restricts attention to confirming evidence and raises rejection thresholds for alternatives; influences appraisal and choice without being an appraisal itself."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Short-term dismissive stance during stress"
+      notes: "Defined as a temporary stance, not a stable disposition."
+
+    - id: S18
+      label: Empathetic
+      status: KEEP
+      summary: "Temporary adoption of another's perspective; social-attunement posture."
+      definition: "A momentary stance of prioritizing another person's perspective or affect in attention and interpretation — increases perspective-taking and social attunement for the episode. Distinct from trait empathy and from empathy-as-emotion."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Adopting a listening, other-focused posture in a conversation"
+      notes: "Keep as 'empathetic stance' with explicit separation from emotion/trait. Avoid wording implying emotional contagion."
+
+    - id: S24
+      label: Cautious
+      status: KEEP
+      summary: "Risk-sensitive regulatory posture: conservative thresholds and slower action selection."
+      definition: "A temporary posture favoring conservative evidence thresholds and deliberate action selection in the episode. Should not be conflated with stable prudence or habitual carefulness."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Temporarily slowing decisions in uncertain contexts"
+      notes: "Wording avoids mechanistic claims; defined by posture and temporal scope."
+
+  removed_mappings:
+    - id: S11
+      label: Hopeful
+      mapping: Mood/Emotion
+      rationale: "Default semantic mapping is future-oriented mood/emotion; S-variant is fragile and rejected for freeze."
+
+    - id: S30
+      label: Patient
+      mapping: Trait
+      rationale: "Default semantic mapping is trait/disposition; episode-level variant rejected for freeze."
+
+    - id: S5
+      label: Creative
+      mapping: Trait/Cognitive-style
+      rationale: "Cognitive style/trait; state-level variant requires narrow redefinition and is rejected for freeze."
+
+    - id: S6
+      label: Analytical
+      mapping: Cognition/Appraisal
+      rationale: "Cognitive processing style; not a regulatory posture."
+
+    - id: S14
+      label: Judgmental
+      mapping: Cognition/Appraisal
+      rationale: "Evaluative/appraisal process, not a posture."
+
+    - id: S16
+      label: Stressed
+      mapping: Mood
+      rationale: "Diffuse affective load/background mood, not a temporary interpretive posture."
+
+    - id: S19
+      label: Reassured
+      mapping: Feeling/Emotion
+      rationale: "Outcome/feeling state; not a posture."
+
+notes: |
+  - This file is the canonical S-layer freeze. It intentionally excludes runtime
+    mapping and supporting state/dimensions. Runtime reconciliation is the next
+    phase and will record verified mappings in a separate artifact.
+### S-layer canonical registry
+# Version: 1
+# This file defines canonical State-of-Mind (S-layer) labels, their semantics,
+# and mappings to in-repo runtime fields.
+
+s_layer_version: 1
+description: |
+  Canonical S-layer (State-of-Mind) vocabulary used to freeze semantics for
+  experiments, audits, and runtime reconciliation. This registry is authoritative
+  for the meanings, ranges, and persistence categories used across the codebase.
+
+labels:
+  awareness:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Agent's current perceptual availability to environmental input; 0=none, 1=fully aware"
+    runtime_mapping: PersonState.state.perception.awareness
+    default: 0.5
+
+  attention:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Allocation of processing capacity toward a stimulus or task; 0=not attending, 1=fully attending"
+    runtime_mapping: PersonState.state.attention
+    default: 0.2
+
+  arousal:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Physiological/activation intensity influencing readiness to act; 0=low, 1=high"
+    runtime_mapping: PersonState.state.arousal
+    default: 0.3
+
+  mood:
+    type: string
+    allowed_values: [neutral, positive, negative]
+    persistence: semi-stable
+    description: "Low-frequency affective background state influencing appraisal bias"
+    runtime_mapping: PersonState.state.mood
+    default: neutral
+
+  valence:
+    type: float
+    range: [-1.0, 1.0]
+    persistence: dynamic
+    description: "Affective valence from negative (-1) to positive (+1). Used in appraisal/emotion mapping."
+    runtime_mapping: PersonState.state.valence
+    default: 0.0
+
+  dominance:
+    type: float
+    range: [-1.0, 1.0]
+    persistence: dynamic
+    description: "Sense of control or influence over events; -1=powerless, +1=in-control"
+    runtime_mapping: PersonState.state.dominance
+    default: 0.0
+
+  confidence:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Belief in the correctness of a current inference or choice"
+    runtime_mapping: PersonState.meta.confidence
+    default: 0.5
+
+  uncertainty:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Estimated epistemic uncertainty about predictions or beliefs"
+    runtime_mapping: SystemMemory.uncertainty_estimate
+    default: 0.5
+
+  engagement:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "Task/goal-oriented engagement level; affects goal priority and persistence"
+    runtime_mapping: PersonState.state.engagement
+    default: 0.0
+
+  habit_bias:
+    type: float
+    range: [0.0, 1.0]
+    persistence: semi-stable
+    description: "Tendency to favor habitual action selection over deliberative choice"
+    runtime_mapping: PersonState.habit_strength
+    default: 0.2
+
+  social_salience:
+    type: float
+    range: [0.0, 1.0]
+    persistence: dynamic
+    description: "How socially relevant current context/stimulus is perceived to be"
+    runtime_mapping: PersonState.state.social_salience
+    default: 0.0
+
+notes: |
+  - This registry is intended as the canonical semantics for the S-layer.
+  - Fields with `persistence: semi-stable` should be versioned separately from
+    short-lived dynamic state; they represent slowly-changing dispositions.
+  - `runtime_mapping` points to the preferred canonical attribute path for
+    runtime reconciliation audits (no code changes are made as part of the freeze).
+# S-layer canonical semantic registry (frozen draft)
+# DO NOT change runtime mappings here. This is a semantic freeze artifact.
+
+s_layer:
+  metadata:
+    name: "StateOfMind (S)"
+    definition: "Interpretive/regulatory posture describing how a person temporarily organizes attention, openness, and response strategy. NOT an emotion, feeling, mood, trait, appraisal conclusion, or observable behavior."
+    boundary_tests:
+      - form_generation: "Remove situation/object — label still names a recognizable temporary posture? (PASS/FAIL)"
+      - situation_removal: "Strip event/appraisal content — remaining concept still a temporary posture? (PASS/FAIL)"
+      - layer_purity: "Avoid valence, bodily feeling, habitual trait, appraisal outcome, or observable action."
+
+  entries:
+    - id: S3
+      label: Curious
+      status: KEEP
+      summary: "Receptive exploratory attention; transient orientation to seek information and broaden hypotheses."
+      definition: "A temporary, information-seeking posture that prioritizes broadened attention and hypothesis sampling for the episode. Organizes exploration strategies but is not an emotion or a trait."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Receptive exploratory attention toward unknown options"
+      notes: "Defined as an episode-level exploratory mode; wording avoids causal mechanisms."
+
+    - id: S8
+      label: Open-minded
+      status: KEEP
+      summary: "Temporarily increased receptivity to alternatives and evidence; lowers immediate dismissal of alternatives."
+      definition: "An episodic receptivity posture that widens acceptance thresholds for novel evidence and reduces immediate dismissal of alternatives; affects evidence-weighting and attention without implying trait-level openness."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Momentary willingness to consider a colleague's opposing view"
+      notes: "Explicitly episode-limited; do not conflate with personality trait."
+
+    - id: S9
+      label: Closed-minded
+      status: KEEP
+      summary: "Temporary narrowing of acceptable perspectives; increased confirmatory stance."
+      definition: "A transient regulatory posture that restricts attention to confirming evidence and raises rejection thresholds for alternatives; influences appraisal and choice without being an appraisal itself."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Short-term dismissive stance during stress"
+      notes: "Defined as a temporary stance, not a stable disposition."
+
+    - id: S18
+      label: Empathetic
+      status: KEEP
+      summary: "Temporary adoption of another's perspective; social-attunement posture."
+      definition: "A momentary stance of prioritizing another person's perspective or affect in attention and interpretation — increases perspective-taking and social attunement for the episode. Distinct from trait empathy and from empathy-as-emotion."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Adopting a listening, other-focused posture in a conversation"
+      notes: "Keep as 'empathetic stance' with explicit separation from emotion/trait. Avoid wording implying emotional contagion."
+
+    - id: S24
+      label: Cautious
+      status: KEEP
+      summary: "Risk-sensitive regulatory posture: conservative thresholds and slower action selection."
+      definition: "A temporary posture favoring conservative evidence thresholds and deliberate action selection in the episode. Should not be conflated with stable prudence or habitual carefulness."
+      tests:
+        form_generation: PASS
+        situation_removal: PASS
+      examples:
+        - "Temporarily slowing decisions in uncertain contexts"
+      notes: "Wording avoids mechanistic claims; defined by posture and temporal scope."
+
+  removed_mappings:
+    - id: S11
+      label: Hopeful
+      mapping: Mood/Emotion
+      rationale: "Default semantic mapping is future-oriented mood/emotion; S-variant is fragile and rejected for freeze."
+
+    - id: S30
+      label: Patient
+      mapping: Trait
+      rationale: "Default semantic mapping is trait/disposition; episode-level variant rejected for freeze."
+
+    - id: S5
+      label: Creative
+      mapping: Trait/Cognitive-style
+      rationale: "Cognitive style/trait; state-level variant requires narrow redefinition and is rejected for freeze."
+
+    - id: S6
+      label: Analytical
+      mapping: Cognition/Appraisal
+      rationale: "Cognitive processing style; not a regulatory posture."
+
+    - id: S14
+      label: Judgmental
+      mapping: Cognition/Appraisal
+      rationale: "Evaluative/appraisal process, not a posture."
+
+    - id: S16
+      label: Stressed
+      mapping: Mood
+      rationale: "Diffuse affective load/background mood, not a temporary interpretive posture."
+
+    - id: S19
+      label: Reassured
+      mapping: Feeling/Emotion
+      rationale: "Outcome/feeling state; not a posture."

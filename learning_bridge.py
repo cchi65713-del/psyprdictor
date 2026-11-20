@@ -69,6 +69,7 @@ class LearningBridge:
         context: Optional[str] = None,
         intensity: Optional[float] = None,
         timestamp: Optional[datetime] = None,
+        efmsomb: Optional[dict] = None,
         **_: Any,
     ) -> Optional[Experience]:
         if actual_outcome is None:
@@ -85,6 +86,7 @@ class LearningBridge:
             context=context or "execution outcome",
             outcome=actual_outcome,
             timestamp=timestamp,
+            efmsomb=efmsomb,
         )
 
     def record_execution(
@@ -106,6 +108,7 @@ class LearningBridge:
         experience: Optional[Experience] = None,
         intensity: Optional[float] = None,
         feedback: Optional[Dict[str, Any]] = None,
+        efmsomb: Optional[dict] = None,
     ) -> Dict[str, Any]:
         """Centralize current execution->learning behavior.
 
@@ -148,12 +151,16 @@ class LearningBridge:
         if store_experience is None:
             store_experience = memory is not None
 
+        if efmsomb is None and person_state is not None:
+            efmsomb = getattr(person_state, "efmsomb", None)
+
         if memory is not None and actual_outcome is not None and store_experience:
             exp = experience if experience is not None else self._build_experience(
                 pattern_path=normalized_path,
                 actual_outcome=actual_outcome,
                 context=context,
                 intensity=intensity,
+                efmsomb=efmsomb,
             )
             if exp is not None:
                 memory.store(exp)

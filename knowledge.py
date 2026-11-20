@@ -52,10 +52,26 @@ EMOTIONS = [
 
 
 # ============================================================
-# FEELINGS — 30
+# FEELINGS — canonical audited set (11 nodes)
+# F11 is intentionally excluded because it belongs to S, not F.
 # ============================================================
 
 FEELINGS = [
+    "Tension",
+    "Constriction",
+    "Heaviness",
+    "Affective Numbing",
+    "Warmth/Expansion",
+    "Felt-pull / Subjective Imperative",
+    "Apprehensive Foreboding",
+    "Agitation/Restlessness",
+    "Emptiness/Hollowing",
+    "Pressure/Surging-Heat",
+    "Depersonalization-style Detachment"
+]
+
+# Legacy catalog retained for provenance only; it is not canonical runtime meaning.
+LEGACY_FEELINGS = [
     "Loved",
     "Cherished",
     "Accepted",
